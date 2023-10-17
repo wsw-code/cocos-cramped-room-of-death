@@ -1,22 +1,9 @@
-import { _decorator, AnimationClip, Component, Animation, SpriteFrame } from 'cc'
-import { FSM_PARAM_TYPE_ENUM, PARAMS_NAME_ENUM } from '../../Enum'
-import State from '../../Base/State'
-import { StateMachine } from '../../Base/StateMachine'
-const { ccclass, property } = _decorator
-
-type ParamsValueType = boolean | number
-
-export interface IParamsValue {
-  type: FSM_PARAM_TYPE_ENUM
-  value: ParamsValueType
-}
-
-export const getInitParamsTrigger = () => {
-  return {
-    type: FSM_PARAM_TYPE_ENUM.TRIGGER,
-    value: false,
-  }
-}
+import { _decorator, Animation } from 'cc'
+import { PARAMS_NAME_ENUM } from '../../Enum'
+import { StateMachine, getInitParamsNumber, getInitParamsTrigger } from '../../Base/StateMachine'
+import IdleSubStateMachine from './IdleSubStateMachine'
+import TurnLeftSubStateMachine from './TurnLeftSubStateMachine'
+const { ccclass } = _decorator
 
 @ccclass('PlayerStateMachine')
 export class PlayerStateMachine extends StateMachine {
@@ -24,22 +11,21 @@ export class PlayerStateMachine extends StateMachine {
     this.animationComponent = this.addComponent(Animation)
     this.initParams()
     this.initStateMachine()
+    this.initAnimationEvent()
     await Promise.all(this.waitingList)
   }
 
   initStateMachine() {
-    this.stateMachines.set(
-      PARAMS_NAME_ENUM.IDLE,
-      new State(this, 'texture/player/idle/top', AnimationClip.WrapMode.Loop),
-    )
+    this.stateMachines.set(PARAMS_NAME_ENUM.IDLE, new IdleSubStateMachine(this))
 
-    this.stateMachines.set(PARAMS_NAME_ENUM.TURNLEFT, new State(this, 'texture/player/turnleft/top'))
+    this.stateMachines.set(PARAMS_NAME_ENUM.TURNLEFT, new TurnLeftSubStateMachine(this))
   }
 
   initAnimationEvent() {
     this.animationComponent.on(Animation.EventType.FINISHED, () => {
       const name = this.animationComponent.defaultClip.name
       const whiteList = ['turn']
+      console.log('name = ', name)
       if (whiteList.some(v => name.includes(v))) {
         this.setParams(PARAMS_NAME_ENUM.IDLE, true)
       }
@@ -49,6 +35,7 @@ export class PlayerStateMachine extends StateMachine {
   initParams() {
     this.params.set(PARAMS_NAME_ENUM.IDLE, getInitParamsTrigger())
     this.params.set(PARAMS_NAME_ENUM.TURNLEFT, getInitParamsTrigger())
+    this.params.set(PARAMS_NAME_ENUM.DIRECTION, getInitParamsNumber())
   }
 
   run() {
@@ -59,6 +46,8 @@ export class PlayerStateMachine extends StateMachine {
           this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.TURNLEFT)
         } else if (this.params.get(PARAMS_NAME_ENUM.IDLE).value) {
           this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.IDLE)
+        } else {
+          this.currentState = this.currentState
         }
         break
       default:

@@ -1,9 +1,10 @@
-import { _decorator, AnimationClip, Component, Animation, SpriteFrame } from 'cc'
-import { FSM_PARAM_TYPE_ENUM, PARAMS_NAME_ENUM } from '../Enum'
+import { _decorator, Component, Animation, SpriteFrame } from 'cc'
+import { FSM_PARAM_TYPE_ENUM } from '../Enum'
 import State from './State'
+import { SubStateMachine } from './SubStateMachine'
 const { ccclass, property } = _decorator
 
-type ParamsValueType = boolean | number
+export type ParamsValueType = boolean | number
 
 export interface IParamsValue {
   type: FSM_PARAM_TYPE_ENUM
@@ -17,18 +18,25 @@ export const getInitParamsTrigger = () => {
   }
 }
 
+export const getInitParamsNumber = () => {
+  return {
+    type: FSM_PARAM_TYPE_ENUM.NUMBER,
+    value: 0,
+  }
+}
+
 @ccclass('StateMachine')
 export abstract class StateMachine extends Component {
-  private _currentState: State = null
+  private _currentState: State | SubStateMachine = null
   params: Map<string, IParamsValue> = new Map()
-  stateMachines: Map<string, State> = new Map()
+  stateMachines: Map<string, State | SubStateMachine> = new Map()
   animationComponent: Animation = null
   waitingList: Array<Promise<SpriteFrame[]>> = []
   get currentState() {
     return this._currentState
   }
 
-  set currentState(newState: State) {
+  set currentState(newState) {
     this._currentState = newState
     this._currentState.run()
   }
@@ -40,7 +48,6 @@ export abstract class StateMachine extends Component {
   }
 
   setParams(paramsName: string, value: ParamsValueType) {
-    console.log(this.params.get(paramsName).value, value)
     this.params.get(paramsName).value = value
     this.run()
     this.resetTrigger()

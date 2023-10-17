@@ -7,7 +7,7 @@ import { DataManager } from 'db://assets/Runtime/DataManager'
 import { EventManager } from '../../Runtime/EventManager'
 import { EVENT_ENUM } from '../../Enum'
 import { PlayerManager } from '../Player/PlayerManager'
-const { ccclass, property } = _decorator
+const { ccclass } = _decorator
 
 @ccclass('BattleManager')
 export class BattleManager extends Component {

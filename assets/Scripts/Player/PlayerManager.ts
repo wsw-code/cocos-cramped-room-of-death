@@ -1,22 +1,11 @@
-import { _decorator, Animation, Component, Sprite, UITransform, AnimationClip, animation, SpriteFrame } from 'cc'
-import { TILE_HEIGHT, TILE_WIDTH } from '../Tile/TileManager'
-import { ResourceManager } from '../../Runtime/ResourceManager'
-import {
-  CONTROLLER_ENUM,
-  DIRECTION_ENUM,
-  DIRECTION_ORDER_ENUM,
-  ENTITY_STATE_ENUM,
-  ENTITY_TYPE_ENUM,
-  EVENT_ENUM,
-  PARAMS_NAME_ENUM,
-} from '../../Enum'
+import { _decorator } from 'cc'
+
+import { CONTROLLER_ENUM, DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enum'
 import { EventManager } from '../../Runtime/EventManager'
 import { PlayerStateMachine } from './PlayerStateMachine'
 import { EnityManager } from '../../Base/EnityManager'
 import { DataManager } from '../../Runtime/DataManager'
 const { ccclass } = _decorator
-
-const ANIMATION_SPEED = 1 / 8
 
 @ccclass('PlayerManager')
 export class PlayerManager extends EnityManager {
@@ -117,6 +106,23 @@ export class PlayerManager extends EnityManager {
         if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
         } else {
           this.state = ENTITY_STATE_ENUM.BLOCKFRONT
+          return true
+        }
+      }
+      if (direction === DIRECTION_ENUM.LEFT) {
+        const playerNextY = y - 1
+        const playerNextX = x
+        const weaponNextX = x - 1
+        const weaponNextY = y - 1
+        if (playerNextY < 0) {
+          this.state = ENTITY_STATE_ENUM.BLOCKFRONT
+          return true
+        }
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKLEFT
           return true
         }
       }

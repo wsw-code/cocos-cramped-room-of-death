@@ -3,6 +3,8 @@ import { PARAMS_NAME_ENUM } from '../../Enum'
 import { StateMachine, getInitParamsNumber, getInitParamsTrigger } from '../../Base/StateMachine'
 import IdleSubStateMachine from './IdleSubStateMachine'
 import TurnLeftSubStateMachine from './TurnLeftSubStateMachine'
+import BlockFrontSubStateMachine from './BlockFrontSubStateMachine'
+import BlockTurnLeftSubStateMachine from './BlockTurnLeftSubStateMachine'
 const { ccclass } = _decorator
 
 @ccclass('PlayerStateMachine')
@@ -17,14 +19,15 @@ export class PlayerStateMachine extends StateMachine {
 
   initStateMachine() {
     this.stateMachines.set(PARAMS_NAME_ENUM.IDLE, new IdleSubStateMachine(this))
-
     this.stateMachines.set(PARAMS_NAME_ENUM.TURNLEFT, new TurnLeftSubStateMachine(this))
+    this.stateMachines.set(PARAMS_NAME_ENUM.BLOCKFRONT, new BlockFrontSubStateMachine(this))
+    this.stateMachines.set(PARAMS_NAME_ENUM.BLOCKTURNLEFT, new BlockTurnLeftSubStateMachine(this))
   }
 
   initAnimationEvent() {
     this.animationComponent.on(Animation.EventType.FINISHED, () => {
       const name = this.animationComponent.defaultClip.name
-      const whiteList = ['turn']
+      const whiteList = ['turn', 'block']
       console.log('name = ', name)
       if (whiteList.some(v => name.includes(v))) {
         this.setParams(PARAMS_NAME_ENUM.IDLE, true)
@@ -36,16 +39,24 @@ export class PlayerStateMachine extends StateMachine {
     this.params.set(PARAMS_NAME_ENUM.IDLE, getInitParamsTrigger())
     this.params.set(PARAMS_NAME_ENUM.TURNLEFT, getInitParamsTrigger())
     this.params.set(PARAMS_NAME_ENUM.DIRECTION, getInitParamsNumber())
+    this.params.set(PARAMS_NAME_ENUM.BLOCKFRONT, getInitParamsTrigger())
+    this.params.set(PARAMS_NAME_ENUM.BLOCKTURNLEFT, getInitParamsTrigger())
   }
 
   run() {
     switch (this.currentState) {
       case this.stateMachines.get(PARAMS_NAME_ENUM.TURNLEFT):
       case this.stateMachines.get(PARAMS_NAME_ENUM.IDLE):
+      case this.stateMachines.get(PARAMS_NAME_ENUM.BLOCKFRONT):
+      case this.stateMachines.get(PARAMS_NAME_ENUM.BLOCKTURNLEFT):
         if (this.params.get(PARAMS_NAME_ENUM.TURNLEFT).value) {
           this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.TURNLEFT)
         } else if (this.params.get(PARAMS_NAME_ENUM.IDLE).value) {
           this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.IDLE)
+        } else if (this.params.get(PARAMS_NAME_ENUM.BLOCKFRONT).value) {
+          this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.BLOCKFRONT)
+        } else if (this.params.get(PARAMS_NAME_ENUM.BLOCKTURNLEFT).value) {
+          this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.BLOCKTURNLEFT)
         } else {
           this.currentState = this.currentState
         }

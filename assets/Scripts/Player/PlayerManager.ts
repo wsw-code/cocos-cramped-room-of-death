@@ -57,7 +57,6 @@ export class PlayerManager extends EnityManager {
 
   inputHandle(inputDirection: CONTROLLER_ENUM) {
     if (this.willBlock(inputDirection)) {
-      console.log('block')
       return
     }
 
@@ -65,7 +64,6 @@ export class PlayerManager extends EnityManager {
   }
 
   move(inputDirection: CONTROLLER_ENUM) {
-    console.log(DataManager.Instance.titleInfo)
     if (inputDirection === CONTROLLER_ENUM.TOP) {
       this.targetY -= 1
     } else if (inputDirection === CONTROLLER_ENUM.BOTTOM) {
@@ -75,8 +73,6 @@ export class PlayerManager extends EnityManager {
     } else if (inputDirection === CONTROLLER_ENUM.RIGHT) {
       this.targetX += 1
     } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT) {
-      // this.fsm.setParams(PARAMS_NAME_ENUM.TURNLEFT, true)
-
       if (this.direction === DIRECTION_ENUM.TOP) {
         this.direction = DIRECTION_ENUM.LEFT
       } else if (this.direction === DIRECTION_ENUM.LEFT) {
@@ -87,6 +83,17 @@ export class PlayerManager extends EnityManager {
         this.direction = DIRECTION_ENUM.TOP
       }
       this.state = ENTITY_STATE_ENUM.TURNLEFT
+    } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT) {
+      if (this.direction === DIRECTION_ENUM.TOP) {
+        this.direction = DIRECTION_ENUM.RIGHT
+      } else if (this.direction === DIRECTION_ENUM.LEFT) {
+        this.direction = DIRECTION_ENUM.TOP
+      } else if (this.direction === DIRECTION_ENUM.BOTTOM) {
+        this.direction = DIRECTION_ENUM.LEFT
+      } else if (this.direction === DIRECTION_ENUM.RIGHT) {
+        this.direction = DIRECTION_ENUM.BOTTOM
+      }
+      this.state = ENTITY_STATE_ENUM.TURNRIGHT
     }
   }
   willBlock(inputDirection: CONTROLLER_ENUM) {
@@ -94,15 +101,15 @@ export class PlayerManager extends EnityManager {
     const { titleInfo } = DataManager.Instance
 
     if (inputDirection === CONTROLLER_ENUM.TOP) {
+      const playerNextY = y - 1
       if (direction === DIRECTION_ENUM.TOP) {
-        const playerNextY = y - 1
         const weaponNextY = y - 2
         if (playerNextY < 0) {
           this.state = ENTITY_STATE_ENUM.BLOCKFRONT
           return true
         }
-        const playerTile = titleInfo[x][playerNextY]
-        const weaponTile = titleInfo[x][weaponNextY]
+        const playerTile = titleInfo[x]?.[playerNextY]
+        const weaponTile = titleInfo[x]?.[weaponNextY]
         if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
         } else {
           this.state = ENTITY_STATE_ENUM.BLOCKFRONT
@@ -110,12 +117,11 @@ export class PlayerManager extends EnityManager {
         }
       }
       if (direction === DIRECTION_ENUM.LEFT) {
-        const playerNextY = y - 1
         const playerNextX = x
         const weaponNextX = x - 1
         const weaponNextY = y - 1
         if (playerNextY < 0) {
-          this.state = ENTITY_STATE_ENUM.BLOCKFRONT
+          this.state = ENTITY_STATE_ENUM.BLOCKLEFT
           return true
         }
         const playerTile = titleInfo[playerNextX][playerNextY]
@@ -123,6 +129,187 @@ export class PlayerManager extends EnityManager {
         if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
         } else {
           this.state = ENTITY_STATE_ENUM.BLOCKLEFT
+          return true
+        }
+      }
+      if (direction === DIRECTION_ENUM.BOTTOM) {
+        if (playerNextY < 0) {
+          this.state = ENTITY_STATE_ENUM.BLOCKBACK
+          return true
+        }
+        const playerTile = titleInfo[x]?.[playerNextY]
+        if (playerTile && playerTile.moveable) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKBACK
+          return true
+        }
+      }
+      if (direction === DIRECTION_ENUM.RIGHT) {
+        if (playerNextY < 0) {
+          this.state = ENTITY_STATE_ENUM.BLOCKRIGHT
+          return true
+        }
+        const playerNextX = x
+        const weaponNextX = x - 1
+        const weaponNextY = y - 1
+        const playerTile = titleInfo[playerNextX]?.[playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKRIGHT
+          return true
+        }
+      }
+    } else if (inputDirection === CONTROLLER_ENUM.BOTTOM) {
+      const playerNextY = y + 1
+
+      if (direction === DIRECTION_ENUM.TOP) {
+        const playerNextX = x
+        const weaponNextX = x
+        const weaponNextY = y
+
+        const playerTile = titleInfo[playerNextX]?.[playerNextY]
+        const weaponTile = titleInfo[weaponNextX]?.[weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKFRONT
+          return true
+        }
+      }
+      if (direction === DIRECTION_ENUM.LEFT) {
+        const playerNextX = x
+        const weaponNextX = x - 1
+        const weaponNextY = y + 1
+        if (playerNextY < 0) {
+          this.state = ENTITY_STATE_ENUM.BLOCKLEFT
+          return true
+        }
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKLEFT
+          return true
+        }
+      }
+      if (direction === DIRECTION_ENUM.BOTTOM) {
+        const playerNextX = x
+        const weaponNextX = x
+        const weaponNextY = y + 2
+
+        const playerTile = titleInfo[playerNextX]?.[playerNextY]
+        const weaponTile = titleInfo[weaponNextX]?.[weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKBACK
+          return true
+        }
+      }
+      if (direction === DIRECTION_ENUM.RIGHT) {
+        const playerNextX = x
+        const weaponNextX = x + 1
+        const weaponNextY = y + 1
+        const playerTile = titleInfo[playerNextX]?.[playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKRIGHT
+          return true
+        }
+      }
+    } else if (inputDirection === CONTROLLER_ENUM.LEFT) {
+      const playerNextX = x - 1
+      if (direction === DIRECTION_ENUM.TOP) {
+        const playerNextY = y
+        const weaponNextX = x - 1
+        const weaponNextY = y - 1
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKLEFT
+
+          return true
+        }
+      } else if (direction === DIRECTION_ENUM.BOTTOM) {
+        const playerNextY = y
+        const weaponNextX = x - 1
+        const weaponNextY = y + 1
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKLEFT
+          return true
+        }
+      } else if (direction === DIRECTION_ENUM.LEFT) {
+        const playerNextY = y
+        const weaponNextX = x - 2
+        const weaponNextY = y
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKFRONT
+          return true
+        }
+      } else if (direction === DIRECTION_ENUM.RIGHT) {
+        const playerNextY = y
+        const weaponNextX = x - 1
+        const weaponNextY = y
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKBACK
+          return true
+        }
+      }
+    } else if (inputDirection === CONTROLLER_ENUM.RIGHT) {
+      const playerNextX = x + 1
+      if (direction === DIRECTION_ENUM.TOP) {
+        const playerNextY = y
+        const weaponNextX = x + 1
+        const weaponNextY = y - 1
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKLEFT
+
+          return true
+        }
+      } else if (direction === DIRECTION_ENUM.BOTTOM) {
+        const playerNextY = y
+        const weaponNextX = x + 1
+        const weaponNextY = y + 1
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKRIGHT
+          return true
+        }
+      } else if (direction === DIRECTION_ENUM.LEFT) {
+        const playerNextY = y
+        const weaponNextX = x + 1
+        const weaponNextY = y
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKBACK
+          return true
+        }
+      } else if (direction === DIRECTION_ENUM.RIGHT) {
+        const playerNextY = y
+        const weaponNextX = x + 2
+        const weaponNextY = y
+        const playerTile = titleInfo[playerNextX][playerNextY]
+        const weaponTile = titleInfo[weaponNextX][weaponNextY]
+        if (playerTile && playerTile.moveable && (!weaponTile || weaponTile.turnable)) {
+        } else {
+          this.state = ENTITY_STATE_ENUM.BLOCKFRONT
           return true
         }
       }

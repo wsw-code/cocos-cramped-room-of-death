@@ -7,6 +7,7 @@ import { DataManager } from 'db://assets/Runtime/DataManager'
 import { EventManager } from '../../Runtime/EventManager'
 import { EVENT_ENUM } from '../../Enum'
 import { PlayerManager } from '../Player/PlayerManager'
+import { WoodenSkeletonManager } from '../WoodenSkeleton/WoodenSkeletonManager'
 const { ccclass } = _decorator
 
 @ccclass('BattleManager')
@@ -26,6 +27,7 @@ export class BattleManager extends Component {
     this.generateStage()
     this.initLevel()
     this.generatePlayer()
+    this.generateEnemies()
   }
 
   initLevel() {
@@ -47,6 +49,13 @@ export class BattleManager extends Component {
     player.setParent(this.stage)
     const playerManager = player.addComponent(PlayerManager)
     playerManager.init()
+  }
+
+  generateEnemies() {
+    const enemy = createUINode()
+    enemy.setParent(this.stage)
+    const enemyManager = enemy.addComponent(WoodenSkeletonManager)
+    enemyManager.init()
   }
 
   clearLevel() {

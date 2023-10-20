@@ -8,6 +8,11 @@ import { ResourceManager } from '../Runtime/ResourceManager'
 import { StateMachine } from './StateMachine'
 const ANIMATION_SPEED = 1 / 8
 
+const getNumberFromString = (a: string) => {
+  let num = Number(a.replace(/[^0-9]/gi, ''))
+  return num ? num : 0
+}
+
 export default class State {
   private animationClip: AnimationClip = null
   constructor(
@@ -22,13 +27,19 @@ export default class State {
     const promise = ResourceManager.Instance.loadDir(this.path)
     this.fsm.waitingList.push(promise)
     const spriteFrames = await promise
+
     this.animationClip = new AnimationClip()
 
     const track = new animation.ObjectTrack() // 创建一个对象轨道
 
     track.path = new animation.TrackPath().toComponent(Sprite).toProperty('spriteFrame')
 
-    const frames: Array<[number, SpriteFrame]> = spriteFrames.map((el, index) => [ANIMATION_SPEED * index, el])
+    /**
+     * 使用sort 确保动画播放顺序
+     */
+    const frames: Array<[number, SpriteFrame]> = spriteFrames
+      .sort((a, b) => getNumberFromString(a.name) - getNumberFromString(b.name))
+      .map((el, index) => [ANIMATION_SPEED * index, el])
 
     track.channel.curve.assignSorted(frames)
 

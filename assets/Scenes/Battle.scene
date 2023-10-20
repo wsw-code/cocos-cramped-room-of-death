@@ -182,7 +182,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 480.00000000000006,
+    "_orthoHeight": 480,
     "_near": 0,
     "_far": 1000,
     "_color": {
@@ -1322,7 +1322,7 @@
     "component": "",
     "_componentId": "e8500HPTp5F+KsDOxRCfyvY",
     "handler": "hanledCtrl",
-    "customEventData": ""
+    "customEventData": "TURNRIGHT"
   },
   {
     "__type__": "cc.Node",

@@ -1,7 +1,5 @@
 import { _decorator, SpriteFrame, resources } from 'cc'
-
 import Singleton from '../Base/Singleton'
-const { ccclass, property } = _decorator
 
 export class ResourceManager extends Singleton {
   static get Instance() {

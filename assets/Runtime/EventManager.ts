@@ -1,7 +1,5 @@
-import { _decorator, Component, Node } from 'cc'
-import { ITile } from '../Levels'
+import { _decorator } from 'cc'
 import Singleton from '../Base/Singleton'
-const { ccclass, property } = _decorator
 
 interface IItem {
   func: Function

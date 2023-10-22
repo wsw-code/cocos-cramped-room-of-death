@@ -339,6 +339,32 @@ export class PlayerManager extends EnityManager {
         this.state = ENTITY_STATE_ENUM.BLOCKTURNLEFT
         return true
       }
+    } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT) {
+      let nextX
+      let nextY
+      if (direction === DIRECTION_ENUM.TOP) {
+        nextX = x + 1
+        nextY = y - 1
+      } else if (direction === DIRECTION_ENUM.BOTTOM) {
+        nextX = x - 1
+        nextY = y + 1
+      } else if (direction === DIRECTION_ENUM.LEFT) {
+        nextX = x - 1
+        nextY = y - 1
+      } else if (direction === DIRECTION_ENUM.RIGHT) {
+        nextX = x + 1
+        nextY = y + 1
+      }
+
+      if (
+        (!titleInfo[x][nextY] || titleInfo[x][nextY].turnable) &&
+        (!titleInfo[nextX][y] || titleInfo[nextX][y].turnable) &&
+        (!titleInfo[nextX][nextY] || titleInfo[nextX][nextY].turnable)
+      ) {
+      } else {
+        this.state = ENTITY_STATE_ENUM.BLOCKTURNLEFT
+        return true
+      }
     }
 
     return false

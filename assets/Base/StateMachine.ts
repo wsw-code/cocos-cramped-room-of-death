@@ -48,6 +48,7 @@ export abstract class StateMachine extends Component {
   }
 
   setParams(paramsName: string, value: ParamsValueType) {
+    console.log(paramsName,value)
     this.params.get(paramsName).value = value
     this.run()
     this.resetTrigger()

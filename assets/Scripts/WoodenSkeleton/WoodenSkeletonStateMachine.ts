@@ -31,6 +31,7 @@ export class WoodenSkeletonStateMachine extends StateMachine {
 
   initParams() {
     this.params.set(PARAMS_NAME_ENUM.IDLE, getInitParamsTrigger())
+    this.params.set(PARAMS_NAME_ENUM.DIRECTION, getInitParamsNumber())
   }
 
   run() {

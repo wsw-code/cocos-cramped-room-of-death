@@ -44,18 +44,21 @@ export class BattleManager extends Component {
     }
   }
 
-  generatePlayer() {
+  async generatePlayer() {
     const player = createUINode()
     player.setParent(this.stage)
     const playerManager = player.addComponent(PlayerManager)
-    playerManager.init()
+    await playerManager.init()
+    DataManager.Instance.player = playerManager
+    EventManager.Instance.emit(EVENT_ENUM.PLAYER_BORN)
   }
 
-  generateEnemies() {
+  async generateEnemies() {
     const enemy = createUINode()
     enemy.setParent(this.stage)
     const enemyManager = enemy.addComponent(WoodenSkeletonManager)
-    enemyManager.init()
+    await enemyManager.init()
+    DataManager.Instance.enemies.push(enemyManager)
   }
 
   clearLevel() {
@@ -73,11 +76,11 @@ export class BattleManager extends Component {
     this.stage.setParent(this.node)
   }
 
-  generateTileMap() {
+  async generateTileMap() {
     const tileMap = createUINode()
     tileMap.setParent(this.stage)
     const tileMapManager = tileMap.addComponent(TileMapManager)
-    tileMapManager.init()
+    await tileMapManager.init()
     this.adaptPos()
   }
 

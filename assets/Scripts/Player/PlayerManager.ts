@@ -17,8 +17,8 @@ export class PlayerManager extends EnityManager {
   async init() {
     this.fsm = this.addComponent(PlayerStateMachine)
     await this.fsm.init()
-    this.x = 2
-    this.y = 8
+    this.x = 3
+    this.y = 7
     this.targetX = this.x
     this.targetY = this.y
     super.init({
@@ -30,11 +30,16 @@ export class PlayerManager extends EnityManager {
     })
 
     EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputHandle, this)
+    EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDead, this)
   }
 
   protected update(): void {
     this.updateXY()
     super.update()
+  }
+
+  onDead(type: ENTITY_STATE_ENUM) {
+    this.state = type
   }
 
   updateXY() {
@@ -59,6 +64,14 @@ export class PlayerManager extends EnityManager {
   }
 
   inputHandle(inputDirection: CONTROLLER_ENUM) {
+    if (this.state === ENTITY_STATE_ENUM.DEATH || this.state === ENTITY_STATE_ENUM.AIRDEATH) {
+      return
+    }
+
+    if (this.willAttack(inputDirection)) {
+      return
+    }
+
     if (this.willBlock(inputDirection)) {
       return
     }
@@ -105,6 +118,37 @@ export class PlayerManager extends EnityManager {
       this.state = ENTITY_STATE_ENUM.TURNRIGHT
     }
   }
+
+  willAttack(inputDirection: CONTROLLER_ENUM) {
+    const enemies = DataManager.Instance.enemies
+    for (let index = 0; index < enemies.length; index++) {
+      const { x: enemyX, y: enemyY } = enemies[index]
+      if (
+        (inputDirection === CONTROLLER_ENUM.TOP &&
+          this.direction === DIRECTION_ENUM.TOP &&
+          this.x === enemyX &&
+          this.y === enemyY + 2) ||
+        (inputDirection === CONTROLLER_ENUM.BOTTOM &&
+          this.direction === DIRECTION_ENUM.BOTTOM &&
+          this.x === enemyX &&
+          this.y === enemyY - 2) ||
+        (inputDirection === CONTROLLER_ENUM.RIGHT &&
+          this.direction === DIRECTION_ENUM.RIGHT &&
+          this.y === enemyY &&
+          this.x === enemyX - 2) ||
+        (inputDirection === CONTROLLER_ENUM.LEFT &&
+          this.direction === DIRECTION_ENUM.LEFT &&
+          this.y === enemyY &&
+          this.x === enemyX + 2)
+      ) {
+        this.state = ENTITY_STATE_ENUM.ATTACK
+        return true
+      }
+    }
+
+    return false
+  }
+
   willBlock(inputDirection: CONTROLLER_ENUM) {
     const { targetX: x, targetY: y, direction } = this
     const { titleInfo } = DataManager.Instance

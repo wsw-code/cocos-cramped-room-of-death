@@ -26,8 +26,8 @@ export class BattleManager extends Component {
   start() {
     this.generateStage()
     this.initLevel()
-    this.generatePlayer()
     this.generateEnemies()
+    this.generatePlayer()
   }
 
   initLevel() {
@@ -50,7 +50,7 @@ export class BattleManager extends Component {
     const playerManager = player.addComponent(PlayerManager)
     await playerManager.init()
     DataManager.Instance.player = playerManager
-    EventManager.Instance.emit(EVENT_ENUM.PLAYER_BORN)
+    EventManager.Instance.emit(EVENT_ENUM.PLAYER_BORN, true)
   }
 
   async generateEnemies() {

@@ -1,5 +1,5 @@
 import { _decorator, Animation } from 'cc'
-import { PARAMS_NAME_ENUM } from '../../Enum'
+import { ENTITY_STATE_ENUM, PARAMS_NAME_ENUM } from '../../Enum'
 import { StateMachine, getInitParamsNumber, getInitParamsTrigger } from '../../Base/StateMachine'
 import IdleSubStateMachine from './IdleSubStateMachine'
 import TurnLeftSubStateMachine from './TurnLeftSubStateMachine'
@@ -11,6 +11,8 @@ import BlockRightSubStateMachine from './BlockRightSubStateMachine'
 import TurnRightSubStateMachine from './TurnRightSubStateMachine'
 import DeathSubStateMachine from './DeathSubStateMachine'
 import AttackSubStateMachine from './AttackSubStateMachine'
+import { EnityManager } from '../../Base/EnityManager'
+import AirDeathSubStateMachine from './AirDeathSubStateMachine'
 const { ccclass } = _decorator
 
 @ccclass('PlayerStateMachine')
@@ -34,6 +36,7 @@ export class PlayerStateMachine extends StateMachine {
     this.stateMachines.set(PARAMS_NAME_ENUM.BLOCKRIGHT, new BlockRightSubStateMachine(this))
     this.stateMachines.set(PARAMS_NAME_ENUM.DEATH, new DeathSubStateMachine(this))
     this.stateMachines.set(PARAMS_NAME_ENUM.ATTACK, new AttackSubStateMachine(this))
+    this.stateMachines.set(PARAMS_NAME_ENUM.AIRDEATH, new AirDeathSubStateMachine(this))
   }
 
   initAnimationEvent() {
@@ -41,7 +44,8 @@ export class PlayerStateMachine extends StateMachine {
       const name = this.animationComponent.defaultClip.name
       const whiteList = ['turn', 'block', 'attack']
       if (whiteList.some(v => name.includes(v))) {
-        this.setParams(PARAMS_NAME_ENUM.IDLE, true)
+        // this.setParams(PARAMS_NAME_ENUM.IDLE, true)
+        this.node.getComponent(EnityManager).state = ENTITY_STATE_ENUM.IDLE
       }
     })
   }
@@ -59,6 +63,7 @@ export class PlayerStateMachine extends StateMachine {
     this.params.set(PARAMS_NAME_ENUM.BLOCKRIGHT, getInitParamsTrigger())
     this.params.set(PARAMS_NAME_ENUM.DEATH, getInitParamsTrigger())
     this.params.set(PARAMS_NAME_ENUM.ATTACK, getInitParamsTrigger())
+    this.params.set(PARAMS_NAME_ENUM.AIRDEATH, getInitParamsTrigger())
   }
 
   run() {
@@ -74,6 +79,7 @@ export class PlayerStateMachine extends StateMachine {
       case this.stateMachines.get(PARAMS_NAME_ENUM.BLOCKRIGHT):
       case this.stateMachines.get(PARAMS_NAME_ENUM.DEATH):
       case this.stateMachines.get(PARAMS_NAME_ENUM.ATTACK):
+      case this.stateMachines.get(PARAMS_NAME_ENUM.AIRDEATH):
         if (this.params.get(PARAMS_NAME_ENUM.TURNLEFT).value) {
           this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.TURNLEFT)
         } else if (this.params.get(PARAMS_NAME_ENUM.TURNRIGHT).value) {
@@ -94,6 +100,8 @@ export class PlayerStateMachine extends StateMachine {
           this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.DEATH)
         } else if (this.params.get(PARAMS_NAME_ENUM.ATTACK).value) {
           this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.ATTACK)
+        } else if (this.params.get(PARAMS_NAME_ENUM.AIRDEATH).value) {
+          this.currentState = this.stateMachines.get(PARAMS_NAME_ENUM.AIRDEATH)
         } else {
           this.currentState = this.currentState
         }

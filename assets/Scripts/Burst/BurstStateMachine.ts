@@ -1,38 +1,28 @@
 import { _decorator, Animation } from 'cc'
-import { ENTITY_STATE_ENUM, PARAMS_NAME_ENUM } from '../../Enum'
+import { PARAMS_NAME_ENUM } from '../../Enum'
 import { StateMachine, getInitParamsNumber, getInitParamsTrigger } from '../../Base/StateMachine'
-import IdleSubStateMachine from './IdleSubStateMachine'
-import AttackSubStateMachine from './AttackSubStateMachine'
-import { EnityManager } from '../../Base/EnityManager'
-import DeathSubStateMachine from './DeathSubStateMachine'
+import State from '../../Base/State'
+
+const IDLE_BASE_URL = 'texture/burst/idle'
+const ATTACK_BASE_URL = 'texture/burst/attack'
+const DEATH_BASE_URL = 'texture/burst/death'
 
 const { ccclass } = _decorator
 
-@ccclass('WoodenSkeletonStateMachine')
-export class WoodenSkeletonStateMachine extends StateMachine {
+@ccclass('BurstStateMachine')
+export class BurstStateMachine extends StateMachine {
   async init() {
     this.animationComponent = this.addComponent(Animation)
     this.initParams()
     this.initStateMachine()
-    this.initAnimationEvent()
+
     await Promise.all(this.waitingList)
   }
 
   initStateMachine() {
-    this.stateMachines.set(PARAMS_NAME_ENUM.IDLE, new IdleSubStateMachine(this))
-    this.stateMachines.set(PARAMS_NAME_ENUM.ATTACK, new AttackSubStateMachine(this))
-    this.stateMachines.set(PARAMS_NAME_ENUM.DEATH, new DeathSubStateMachine(this))
-  }
-
-  initAnimationEvent() {
-    this.animationComponent.on(Animation.EventType.FINISHED, () => {
-      const name = this.animationComponent.defaultClip.name
-      const whiteList = ['attack']
-      if (whiteList.some(v => name.includes(v))) {
-        // this.setParams(PARAMS_NAME_ENUM.IDLE, true)
-        this.node.getComponent(EnityManager).state = ENTITY_STATE_ENUM.IDLE
-      }
-    })
+    this.stateMachines.set(PARAMS_NAME_ENUM.IDLE, new State(this, IDLE_BASE_URL))
+    this.stateMachines.set(PARAMS_NAME_ENUM.ATTACK, new State(this, ATTACK_BASE_URL))
+    this.stateMachines.set(PARAMS_NAME_ENUM.DEATH, new State(this, DEATH_BASE_URL))
   }
 
   initParams() {

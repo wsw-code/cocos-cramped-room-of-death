@@ -9,16 +9,18 @@ import {
   EVENT_ENUM,
   PARAMS_NAME_ENUM,
 } from '../Enum'
-import { PlayerStateMachine } from '../Scripts/Player/PlayerStateMachine'
+
 import { IEntity } from '../Levels'
 const { ccclass } = _decorator
+import { randomByLen } from '../Utils'
+import { StateMachine } from './StateMachine'
 
 @ccclass('EnityManager')
 export class EnityManager extends Component {
   x: number = 0
   y: number = 0
-
-  fsm: PlayerStateMachine = null
+  id: string = randomByLen(12)
+  fsm: StateMachine = null
 
   private _direction: DIRECTION_ENUM
   private _state: ENTITY_STATE_ENUM

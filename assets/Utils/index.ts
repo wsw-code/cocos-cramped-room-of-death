@@ -9,3 +9,7 @@ export const createUINode = (name: string = '') => {
 }
 
 export const randomByRange = (start: number, end: number) => Math.floor(start + (end - start) * Math.random())
+
+export const randomByLen = (len: number) => {
+  return Array.from({ length: len }).reduce<string>((total, item) => total + Math.floor(Math.random() * 10), '')
+}

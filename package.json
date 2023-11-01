@@ -3,7 +3,7 @@
   "uuid": "22f2bc02-2d37-4974-8737-adc77bb1b348",
   "version": "3.4.2",
   "creator": {
-    "version": "3.8.0"
+    "version": "3.8.1"
   },
   "scripts": {
     "lint": "eslint --fix & prettier --write src/**"

@@ -5,9 +5,13 @@ import Levels, { ILevel } from '../../Levels'
 import { TILE_HEIGHT, TILE_WIDTH } from '../Tile/TileManager'
 import { DataManager } from 'db://assets/Runtime/DataManager'
 import { EventManager } from '../../Runtime/EventManager'
-import { EVENT_ENUM } from '../../Enum'
+import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enum'
 import { PlayerManager } from '../Player/PlayerManager'
 import { WoodenSkeletonManager } from '../WoodenSkeleton/WoodenSkeletonManager'
+import { DoorManager } from '../Door/DoorManager'
+import { IronSkeletonManager } from '../IronSkeleton/IronSkeletonManager'
+import { BurstManager } from '../Burst/BurstManager'
+import { SpikesManager } from '../Spikes/SpikesManager'
 const { ccclass } = _decorator
 
 @ccclass('BattleManager')
@@ -27,13 +31,15 @@ export class BattleManager extends Component {
     this.generateStage()
     this.initLevel()
     this.generateEnemies()
+    this.generateIronEnemies()
+    this.generateBursts()
+    this.generateSpikes()
     this.generatePlayer()
+    this.generateDoor()
   }
 
   initLevel() {
-    // const level = levels[]
     const level = Levels[`level${DataManager.Instance.levelIndex}`]
-
     if (level) {
       this.clearLevel()
       this.level = level
@@ -42,6 +48,47 @@ export class BattleManager extends Component {
       DataManager.Instance.mapColumnCount = this.level.mapInfo[0].length || 0
       this.generateTileMap()
     }
+  }
+
+  async generateBursts() {
+    const player = createUINode()
+    player.setParent(this.stage)
+    const burstManager = player.addComponent(BurstManager)
+    await burstManager.init({
+      x: 2,
+      y: 6,
+      type: ENTITY_TYPE_ENUM.DOOR,
+      direction: DIRECTION_ENUM.TOP,
+      state: ENTITY_STATE_ENUM.IDLE,
+    })
+    DataManager.Instance.bursts.push(burstManager)
+  }
+
+  async generateDoor() {
+    const player = createUINode()
+    player.setParent(this.stage)
+    const doorManager = player.addComponent(DoorManager)
+    await doorManager.init({
+      x: 7,
+      y: 8,
+      type: ENTITY_TYPE_ENUM.DOOR,
+      direction: DIRECTION_ENUM.TOP,
+      state: ENTITY_STATE_ENUM.IDLE,
+    })
+    DataManager.Instance.door = doorManager
+  }
+
+  async generateSpikes() {
+    const player = createUINode()
+    player.setParent(this.stage)
+    const spikesManager = player.addComponent(SpikesManager)
+    await spikesManager.init({
+      x: 2,
+      y: 3,
+      type: ENTITY_TYPE_ENUM.SPIKES_FOUR,
+      count: 0,
+    })
+    DataManager.Instance.spikes.push(spikesManager)
   }
 
   async generatePlayer() {
@@ -57,8 +104,28 @@ export class BattleManager extends Component {
     const enemy = createUINode()
     enemy.setParent(this.stage)
     const enemyManager = enemy.addComponent(WoodenSkeletonManager)
-    await enemyManager.init()
+    await enemyManager.init({
+      x: 7,
+      y: 5,
+      type: ENTITY_TYPE_ENUM.SKELETON_WOODEN,
+      direction: DIRECTION_ENUM.TOP,
+      state: ENTITY_STATE_ENUM.IDLE,
+    })
     DataManager.Instance.enemies.push(enemyManager)
+  }
+
+  async generateIronEnemies() {
+    const enemy = createUINode()
+    enemy.setParent(this.stage)
+    const ironEnemyManager = enemy.addComponent(IronSkeletonManager)
+    await ironEnemyManager.init({
+      x: 7,
+      y: 3,
+      type: ENTITY_TYPE_ENUM.SKELETON_IRON,
+      direction: DIRECTION_ENUM.TOP,
+      state: ENTITY_STATE_ENUM.IDLE,
+    })
+    DataManager.Instance.enemies.push(ironEnemyManager)
   }
 
   clearLevel() {

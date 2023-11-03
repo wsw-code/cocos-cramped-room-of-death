@@ -6,7 +6,7 @@
 import { AnimationClip, Sprite, SpriteFrame, animation } from 'cc'
 import { ResourceManager } from '../Runtime/ResourceManager'
 import { StateMachine } from './StateMachine'
-const ANIMATION_SPEED = 1 / 8
+export const ANIMATION_SPEED = 1 / 8
 
 const getNumberFromString = (a: string) => {
   let num = Number(a.replace(/[^0-9]/gi, ''))
@@ -19,6 +19,7 @@ export default class State {
     private fsm: StateMachine,
     private path: string,
     private wrapMode: AnimationClip.WrapMode = AnimationClip.WrapMode.Normal,
+    private speed: number = ANIMATION_SPEED,
   ) {
     this.init()
   }
@@ -39,14 +40,14 @@ export default class State {
      */
     const frames: Array<[number, SpriteFrame]> = spriteFrames
       .sort((a, b) => getNumberFromString(a.name) - getNumberFromString(b.name))
-      .map((el, index) => [ANIMATION_SPEED * index, el])
+      .map((el, index) => [this.speed * index, el])
 
     track.channel.curve.assignSorted(frames)
 
     // 最后将轨道添加到动画剪辑以应用
     this.animationClip.addTrack(track)
     this.animationClip.name = this.path
-    this.animationClip.duration = frames.length * ANIMATION_SPEED
+    this.animationClip.duration = frames.length * this.speed
     this.animationClip.wrapMode = this.wrapMode
   }
 

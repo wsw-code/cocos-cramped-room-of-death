@@ -28,8 +28,8 @@ export class TileManager extends Component {
       this.type === TILE_TYPE_ENUM.CLIFF_LEFT ||
       this.type === TILE_TYPE_ENUM.CLIFF_RIGHT
     ) {
-      this.moveable = true
-      this.turnable = false
+      this.moveable = false
+      this.turnable = true
     } else if (this.type === TILE_TYPE_ENUM.FLOOR) {
       this.moveable = true
       this.turnable = true

@@ -17,7 +17,7 @@ export class WoodenSkeletonManager extends EnemyManager {
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onAttack, this)
     this.onChangeDirection(true)
   }
-  protected onDestroy(): void {
+  onDestroy(): void {
     super.onDestroy()
     EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onAttack)
   }

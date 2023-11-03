@@ -1,13 +1,13 @@
 import { _decorator } from 'cc'
-import { IronSkeletonStateMachine } from './IronSkeletonStateMachine'
 import { EnemyManager } from '../../Base/EnemyManager'
 import { IEntity } from '../../Levels'
+import { SmokeStateMachine } from './SmokeStateMachine'
 const { ccclass } = _decorator
 
-@ccclass('IronSkeletonManager')
-export class IronSkeletonManager extends EnemyManager {
+@ccclass('SmokeManager')
+export class SmokeManager extends EnemyManager {
   async init(params: IEntity) {
-    this.fsm = this.addComponent(IronSkeletonStateMachine)
+    this.fsm = this.addComponent(SmokeStateMachine)
     await this.fsm.init()
     super.init(params)
     this.onChangeDirection(true)

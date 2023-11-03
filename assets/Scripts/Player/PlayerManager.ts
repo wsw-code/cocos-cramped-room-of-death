@@ -6,6 +6,7 @@ import { PlayerStateMachine } from './PlayerStateMachine'
 import { EnityManager } from '../../Base/EnityManager'
 import { DataManager } from '../../Runtime/DataManager'
 import { EnemyManager } from '../../Base/EnemyManager'
+import { IEntity } from '../../Levels'
 const { ccclass } = _decorator
 
 @ccclass('PlayerManager')
@@ -15,23 +16,20 @@ export class PlayerManager extends EnityManager {
   private readonly speed = 1 / 10
   private isMoving: boolean = false
 
-  async init() {
+  async init(params: IEntity) {
     this.fsm = this.addComponent(PlayerStateMachine)
     await this.fsm.init()
-    this.x = 2
-    this.y = 7
+    super.init(params)
     this.targetX = this.x
     this.targetY = this.y
-    super.init({
-      x: this.x,
-      y: this.y,
-      type: ENTITY_TYPE_ENUM.PLAYER,
-      direction: DIRECTION_ENUM.TOP,
-      state: ENTITY_STATE_ENUM.IDLE,
-    })
-
     EventManager.Instance.on(EVENT_ENUM.PLAYER_CTRL, this.inputHandle, this)
     EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDead, this)
+  }
+
+  onDestroy(): void {
+    super.onDestroy()
+    EventManager.Instance.off(EVENT_ENUM.PLAYER_CTRL, this.inputHandle)
+    EventManager.Instance.off(EVENT_ENUM.ATTACK_PLAYER, this.onDead)
   }
 
   protected update(): void {
@@ -65,7 +63,6 @@ export class PlayerManager extends EnityManager {
   }
 
   inputHandle(inputDirection: CONTROLLER_ENUM) {
-    console.log('state', this.state)
     if (
       this.state === ENTITY_STATE_ENUM.DEATH ||
       this.state === ENTITY_STATE_ENUM.AIRDEATH ||
@@ -88,19 +85,27 @@ export class PlayerManager extends EnityManager {
     this.move(inputDirection)
   }
 
+  showSmoke(type: DIRECTION_ENUM) {
+    EventManager.Instance.emit(EVENT_ENUM.SHOW_SMOKE, this.x, this.y, type)
+  }
+
   move(inputDirection: CONTROLLER_ENUM) {
     if (inputDirection === CONTROLLER_ENUM.TOP) {
       this.targetY -= 1
       this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.TOP)
     } else if (inputDirection === CONTROLLER_ENUM.BOTTOM) {
       this.targetY += 1
       this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.BOTTOM)
     } else if (inputDirection === CONTROLLER_ENUM.LEFT) {
       this.targetX -= 1
       this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.LEFT)
     } else if (inputDirection === CONTROLLER_ENUM.RIGHT) {
       this.targetX += 1
       this.isMoving = true
+      this.showSmoke(DIRECTION_ENUM.RIGHT)
     } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT) {
       if (this.direction === DIRECTION_ENUM.TOP) {
         this.direction = DIRECTION_ENUM.LEFT

@@ -7,7 +7,7 @@ import { DataManager } from '../Runtime/DataManager'
 import { IEntity } from '../Levels'
 const { ccclass } = _decorator
 
-@ccclass('WoodenSkeletonManager')
+@ccclass('EnemyManager')
 export class EnemyManager extends EnityManager {
   async init(params: IEntity) {
     super.init(params)

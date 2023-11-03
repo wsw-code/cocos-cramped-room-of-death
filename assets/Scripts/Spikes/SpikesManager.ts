@@ -1,6 +1,12 @@
 import { _decorator, Component, Sprite, UITransform } from 'cc'
 
-import { ENTITY_TYPE_ENUM, PARAMS_NAME_ENUM, SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM } from '../../Enum'
+import {
+  ENTITY_STATE_ENUM,
+  ENTITY_TYPE_ENUM,
+  EVENT_ENUM,
+  PARAMS_NAME_ENUM,
+  SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM,
+} from '../../Enum'
 
 import { ISpikes } from '../../Levels'
 const { ccclass } = _decorator
@@ -8,6 +14,8 @@ import { randomByLen } from '../../Utils'
 import { StateMachine } from '../../Base/StateMachine'
 import { SpikeStateMachine } from './SpikeStateMachine'
 import { TILE_HEIGHT, TILE_WIDTH } from '../Tile/TileManager'
+import { EventManager } from '../../Runtime/EventManager'
+import { DataManager } from '../../Runtime/DataManager'
 
 @ccclass('SpikesManager')
 export class SpikesManager extends Component {
@@ -49,9 +57,37 @@ export class SpikesManager extends Component {
     this.y = params.y
     this.totalCount = SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM[params.type]
     this.count = params.count
+
+    EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onLoop, this)
+  }
+
+  protected onDestroy(): void {
+    EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onLoop)
   }
 
   protected update(): void {
     this.node.setPosition(this.x * TILE_WIDTH - TILE_WIDTH * 1.5, -this.y * TILE_HEIGHT + 1.5 * TILE_HEIGHT)
+  }
+
+  onLoop() {
+    if (this.count === this.totalCount) {
+      this.count = 1
+    } else {
+      this.count++
+    }
+
+    this.onAttack()
+  }
+
+  backZero() {
+    this.count = 0
+  }
+
+  onAttack() {
+    const { x: playerX, y: playerY } = DataManager.Instance.player
+
+    if (this.x === playerX && this.y === playerY && this.totalCount === this.count) {
+      EventManager.Instance.emit(EVENT_ENUM.ATTACK_PLAYER, ENTITY_STATE_ENUM.DEATH)
+    }
   }
 }

@@ -5,6 +5,7 @@ import SpikeOneSubStateMachine from './SpikeOneSubStateMachine'
 import SpikeTwoSubStateMachine from './SpikeTwoSubStateMachine'
 import SpikeThreeSubStateMachine from './SpikeThreeSubStateMachine'
 import SpikeFourSubStateMachine from './SpikeFourSubStateMachine'
+import { SpikesManager } from './SpikesManager'
 
 const { ccclass } = _decorator
 
@@ -14,7 +15,7 @@ export class SpikeStateMachine extends StateMachine {
     this.animationComponent = this.addComponent(Animation)
     this.initParams()
     this.initStateMachine()
-
+    this.initAnimationEvent()
     await Promise.all(this.waitingList)
   }
 
@@ -30,10 +31,28 @@ export class SpikeStateMachine extends StateMachine {
     this.params.set(PARAMS_NAME_ENUM.SPIKES_TOTAL_COUNT, getInitParamsNumber())
   }
 
+  initAnimationEvent() {
+    this.animationComponent.on(Animation.EventType.FINISHED, () => {
+      const value = this.getParams(PARAMS_NAME_ENUM.SPIKES_TOTAL_COUNT)
+      const name = this.animationComponent.defaultClip.name
+      if (
+        (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_ONE && name.includes('spikesone/two')) ||
+        (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_TWO && name.includes('spikestwo/three')) ||
+        (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_THREE && name.includes('spikesthree/four')) ||
+        (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_FOUR && name.includes('spikesfour/five'))
+      ) {
+        this.node.getComponent(SpikesManager).backZero()
+      }
+    })
+  }
+
   run() {
     const value = this.getParams(PARAMS_NAME_ENUM.SPIKES_TOTAL_COUNT)
     switch (this.currentState) {
       case this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_ONE):
+      case this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_TWO):
+      case this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_THREE):
+      case this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_FOUR):
         if (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_ONE) {
           this.currentState = this.stateMachines.get(ENTITY_TYPE_ENUM.SPIKES_ONE)
         } else if (value === SPIKES_TYPE_MAP_TOTAL_COUNT_ENUM.SPIKES_TWO) {

@@ -87,6 +87,18 @@ export class BattleManager extends Component {
   }
 
   async generateSmoke(x: number, y: number, direction: DIRECTION_ENUM) {
+    // const item = DataManager.Instance.smokes.find(el => el.state === ENTITY_STATE_ENUM.DEATH)
+
+    // if (item) {
+    //   item.x = x
+    //   item.y = y
+    //   item.direction = direction
+    //   item.state = ENTITY_STATE_ENUM.IDLE
+    //   item.node.setPosition(x * TILE_WIDTH - TILE_WIDTH * 1.5, -y * TILE_HEIGHT + 1.5 * TILE_HEIGHT)
+    // } else {
+
+    // }
+
     const node = createUINode()
     node.setParent(this.smokeLayer)
     const smokeManager = node.addComponent(SmokeManager)
@@ -97,8 +109,8 @@ export class BattleManager extends Component {
       state: ENTITY_STATE_ENUM.IDLE,
       type: ENTITY_TYPE_ENUM.SMOKE,
     })
-    DataManager.Instance.smoke.push(smokeManager)
-    EventManager.Instance.emit(EVENT_ENUM.PLAYER_BORN, true)
+    DataManager.Instance.smokes.push(smokeManager)
+    // EventManager.Instance.emit(EVENT_ENUM.PLAYER_BORN, true)
   }
 
   async generateDoor() {

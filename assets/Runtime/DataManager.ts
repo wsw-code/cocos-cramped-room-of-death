@@ -20,7 +20,7 @@ export class DataManager extends Singleton {
   mapColumnCount: number = 0
   levelIndex: number = 1
   player: PlayerManager
-  smoke: SmokeManager[] = []
+  smokes: SmokeManager[] = []
   enemies: EnemyManager[] = []
   bursts: BurstManager[] = []
   spikes: SpikesManager[] = []
@@ -34,6 +34,6 @@ export class DataManager extends Singleton {
     this.spikes = []
     this.mapInfo = []
     this.titleInfo = []
-    this.smoke = []
+    this.smokes = []
   }
 }

@@ -13,6 +13,7 @@ import { IronSkeletonManager } from '../IronSkeleton/IronSkeletonManager'
 import { BurstManager } from '../Burst/BurstManager'
 import { SpikesManager } from '../Spikes/SpikesManager'
 import { SmokeManager } from '../Smoke/SmokeManager'
+import { FaderManager } from '../../Runtime/FaderManager'
 const { ccclass } = _decorator
 
 @ccclass('BattleManager')
@@ -49,6 +50,7 @@ export class BattleManager extends Component {
   async initLevel() {
     const level = Levels[`level${DataManager.Instance.levelIndex}`]
     if (level) {
+      await FaderManager.Instance.fadeIn()
       this.clearLevel()
       this.level = level
       DataManager.Instance.mapInfo = this.level.mapInfo
@@ -63,8 +65,10 @@ export class BattleManager extends Component {
         this.generateSmokeLayer(),
         this.generateDoor(),
         this.generateEnemies(),
+        this.generatePlayer(),
       ])
-      await this.generatePlayer()
+
+      await FaderManager.Instance.fadeOut()
     }
   }
 

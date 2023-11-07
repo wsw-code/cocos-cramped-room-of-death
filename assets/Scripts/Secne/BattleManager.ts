@@ -14,6 +14,7 @@ import { BurstManager } from '../Burst/BurstManager'
 import { SpikesManager } from '../Spikes/SpikesManager'
 import { SmokeManager } from '../Smoke/SmokeManager'
 import { FaderManager } from '../../Runtime/FaderManager'
+import { ShakeManager } from '../UI/ShakeManager'
 const { ccclass } = _decorator
 
 @ccclass('BattleManager')
@@ -91,18 +92,6 @@ export class BattleManager extends Component {
   }
 
   async generateSmoke(x: number, y: number, direction: DIRECTION_ENUM) {
-    // const item = DataManager.Instance.smokes.find(el => el.state === ENTITY_STATE_ENUM.DEATH)
-
-    // if (item) {
-    //   item.x = x
-    //   item.y = y
-    //   item.direction = direction
-    //   item.state = ENTITY_STATE_ENUM.IDLE
-    //   item.node.setPosition(x * TILE_WIDTH - TILE_WIDTH * 1.5, -y * TILE_HEIGHT + 1.5 * TILE_HEIGHT)
-    // } else {
-
-    // }
-
     const node = createUINode()
     node.setParent(this.smokeLayer)
     const smokeManager = node.addComponent(SmokeManager)
@@ -190,6 +179,7 @@ export class BattleManager extends Component {
   generateStage() {
     this.stage = createUINode()
     this.stage.setParent(this.node)
+    this.stage.addComponent(ShakeManager)
   }
 
   async generateTileMap() {
@@ -204,6 +194,7 @@ export class BattleManager extends Component {
     const { mapRowCount, mapColumnCount } = DataManager.Instance
     const disX = -(TILE_WIDTH * mapRowCount) / 2
     const disY = (TILE_HEIGHT * mapColumnCount) / 2 + 80
+    this.stage.getComponent(ShakeManager).stop()
     this.stage.setPosition(disX, disY)
   }
 }

@@ -32,12 +32,11 @@ export class DrawManager extends Component {
   }
 
   setAlpha(percent: number) {
-    console.log('percent', percent)
     this.ctx.clear()
     this.ctx.rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
     this.ctx.fillColor = new Color(0, 0, 0, 255 * percent)
     this.ctx.fill()
-    this.enabled = percent === 1
+    this.block.enabled = percent === 1
   }
 
   update() {

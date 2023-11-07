@@ -79,6 +79,7 @@ export class PlayerManager extends EnityManager {
     }
 
     if (this.willBlock(inputDirection)) {
+      EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
       return
     }
 

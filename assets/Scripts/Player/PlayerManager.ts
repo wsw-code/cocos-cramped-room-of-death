@@ -1,6 +1,13 @@
 import { _decorator } from 'cc'
 
-import { CONTROLLER_ENUM, DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enum'
+import {
+  CONTROLLER_ENUM,
+  DIRECTION_ENUM,
+  ENTITY_STATE_ENUM,
+  ENTITY_TYPE_ENUM,
+  EVENT_ENUM,
+  SHAKE_TYPE_ENUM,
+} from '../../Enum'
 import { EventManager } from '../../Runtime/EventManager'
 import { PlayerStateMachine } from './PlayerStateMachine'
 import { EnityManager } from '../../Base/EnityManager'
@@ -30,6 +37,11 @@ export class PlayerManager extends EnityManager {
     super.onDestroy()
     EventManager.Instance.off(EVENT_ENUM.PLAYER_CTRL, this.inputHandle)
     EventManager.Instance.off(EVENT_ENUM.ATTACK_PLAYER, this.onDead)
+  }
+
+  onAttackShake(shakeType: SHAKE_TYPE_ENUM) {
+    console.log(111)
+    EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, shakeType)
   }
 
   protected update(): void {
@@ -73,13 +85,40 @@ export class PlayerManager extends EnityManager {
 
     const id = this.willAttack(inputDirection)
     if (id) {
+      EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
+      this.state = ENTITY_STATE_ENUM.ATTACK
       EventManager.Instance.emit(EVENT_ENUM.ATTACK_ENEMY, id)
       EventManager.Instance.emit(EVENT_ENUM.DOOR_OPEN)
+      EventManager.Instance.emit(EVENT_ENUM.PLAYER_MOVE_END)
       return
     }
 
     if (this.willBlock(inputDirection)) {
-      EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE)
+      if (inputDirection === CONTROLLER_ENUM.TOP) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.TOP)
+      } else if (inputDirection === CONTROLLER_ENUM.BOTTOM) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.BOTTOM)
+      } else if (inputDirection === CONTROLLER_ENUM.LEFT) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.LEFT)
+      } else if (inputDirection === CONTROLLER_ENUM.RIGHT) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.RIGHT)
+      } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT && this.direction === DIRECTION_ENUM.TOP) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.LEFT)
+      } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT && this.direction === DIRECTION_ENUM.LEFT) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.BOTTOM)
+      } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT && this.direction === DIRECTION_ENUM.BOTTOM) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.RIGHT)
+      } else if (inputDirection === CONTROLLER_ENUM.TURNLEFT && this.direction === DIRECTION_ENUM.RIGHT) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.TOP)
+      } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT && this.direction === DIRECTION_ENUM.TOP) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.RIGHT)
+      } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT && this.direction === DIRECTION_ENUM.LEFT) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.TOP)
+      } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT && this.direction === DIRECTION_ENUM.BOTTOM) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.LEFT)
+      } else if (inputDirection === CONTROLLER_ENUM.TURNRIGHT && this.direction === DIRECTION_ENUM.RIGHT) {
+        EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, SHAKE_TYPE_ENUM.BOTTOM)
+      }
       return
     }
 
@@ -91,6 +130,7 @@ export class PlayerManager extends EnityManager {
   }
 
   move(inputDirection: CONTROLLER_ENUM) {
+    EventManager.Instance.emit(EVENT_ENUM.RECORD_STEP)
     if (inputDirection === CONTROLLER_ENUM.TOP) {
       this.targetY -= 1
       this.isMoving = true

@@ -20,6 +20,7 @@ export default class State {
     private path: string,
     private wrapMode: AnimationClip.WrapMode = AnimationClip.WrapMode.Normal,
     private speed: number = ANIMATION_SPEED,
+    private events: any[] = [],
   ) {
     this.init()
   }
@@ -49,6 +50,12 @@ export default class State {
     this.animationClip.name = this.path
     this.animationClip.duration = frames.length * this.speed
     this.animationClip.wrapMode = this.wrapMode
+
+    // for (let index = 0; index < this.events.length; index++) {
+    //   const element = this.events[index]
+    //   this.animationClip.events.push(element)
+    // }
+    this.animationClip.events = this.events
   }
 
   run() {

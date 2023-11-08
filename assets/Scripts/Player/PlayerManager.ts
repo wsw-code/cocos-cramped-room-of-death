@@ -35,6 +35,7 @@ export class PlayerManager extends EnityManager {
 
   onDestroy(): void {
     super.onDestroy()
+    console.log('onDestroy')
     EventManager.Instance.off(EVENT_ENUM.PLAYER_CTRL, this.inputHandle)
     EventManager.Instance.off(EVENT_ENUM.ATTACK_PLAYER, this.onDead)
   }

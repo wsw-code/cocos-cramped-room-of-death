@@ -1,6 +1,6 @@
 import { _decorator } from 'cc'
 
-import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enum'
+import { ENTITY_STATE_ENUM, EVENT_ENUM } from '../../Enum'
 import { EnityManager } from '../../Base/EnityManager'
 import { EventManager } from '../../Runtime/EventManager'
 import { DataManager } from '../../Runtime/DataManager'
@@ -16,7 +16,7 @@ export class DoorManager extends EnityManager {
     super.init(params)
     EventManager.Instance.on(EVENT_ENUM.DOOR_OPEN, this.onOpen, this)
   }
-  protected onDestroy(): void {
+  onDestroy(): void {
     super.onDestroy()
     EventManager.Instance.off(EVENT_ENUM.DOOR_OPEN, this.onOpen)
   }

@@ -9,14 +9,14 @@ const { ccclass } = _decorator
 
 @ccclass('EnemyManager')
 export class EnemyManager extends EnityManager {
-  async init(params: IEntity) {
+  init(params: IEntity) {
     super.init(params)
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onChangeDirection, this)
     EventManager.Instance.on(EVENT_ENUM.PLAYER_BORN, this.onChangeDirection, this)
     EventManager.Instance.on(EVENT_ENUM.ATTACK_ENEMY, this.onDead, this)
     this.onChangeDirection(true)
   }
-  protected onDestroy(): void {
+  onDestroy(): void {
     super.onDestroy()
     EventManager.Instance.off(EVENT_ENUM.PLAYER_MOVE_END, this.onChangeDirection)
     EventManager.Instance.off(EVENT_ENUM.PLAYER_BORN, this.onChangeDirection)
@@ -33,15 +33,14 @@ export class EnemyManager extends EnityManager {
   }
 
   onChangeDirection(isInit: boolean = false) {
+    if (this.type === ENTITY_TYPE_ENUM.SKELETON_WOODEN) {
+      console.log(this.id)
+    }
+
     if (this.state === ENTITY_STATE_ENUM.DEATH || !DataManager.Instance.player) {
       return
     }
-    if (!DataManager.Instance.player) {
-      return
-    }
-
     const { x: playerX, y: playerY } = DataManager.Instance.player
-
     const disX = Math.abs(this.x - playerX)
     const disY = Math.abs(this.y - playerY)
 

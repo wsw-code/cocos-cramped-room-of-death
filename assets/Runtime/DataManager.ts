@@ -31,13 +31,32 @@ export class DataManager extends Singleton {
   reset() {
     this.mapRowCount = 0
     this.mapColumnCount = 0
+    this.player?.destroy()
     this.player = null
     this.enemies = []
+    // this.enemies.forEach(el => {
+    //   el?.destroy()
+    // })
+    this.enemies = []
+
+    // this.bursts.forEach(el => {
+    //   el?.destroy()
+    // })
     this.bursts = []
+
+    // this.spikes.forEach(el => {
+    //   el?.destroy()
+    // })
     this.spikes = []
+
+    // this.smokes.forEach(el => {
+    //   el?.destroy()
+    // })
+
+    this.smokes = []
+
+    this.records = []
     this.mapInfo = []
     this.titleInfo = []
-    this.smokes = []
-    this.records = []
   }
 }

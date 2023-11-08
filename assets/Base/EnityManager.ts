@@ -43,7 +43,7 @@ export class EnityManager extends Component {
     this.fsm.setParams(newState, true)
   }
 
-  async init(params: IEntity) {
+  init(params: IEntity) {
     const sprite = this.addComponent(Sprite)
     sprite.sizeMode = Sprite.SizeMode.CUSTOM
 
@@ -57,6 +57,8 @@ export class EnityManager extends Component {
     this.state = params.state
     // this.render()
   }
+
+  onDestroy() {}
 
   protected update(): void {
     this.node.setPosition(this.x * TILE_WIDTH - TILE_WIDTH * 1.5, -this.y * TILE_HEIGHT + 1.5 * TILE_HEIGHT)

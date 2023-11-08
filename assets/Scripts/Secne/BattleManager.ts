@@ -1,11 +1,11 @@
-import { _decorator, Component, Node } from 'cc'
+import { _decorator, Component, director, Node } from 'cc'
 import { TileMapManager } from '../Tile/TileMapManager'
 import { createUINode } from '../../Utils'
 import Levels, { ILevel } from '../../Levels'
 import { TILE_HEIGHT, TILE_WIDTH } from '../Tile/TileManager'
 import { DataManager, IRecord } from 'db://assets/Runtime/DataManager'
 import { EventManager } from '../../Runtime/EventManager'
-import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM } from '../../Enum'
+import { DIRECTION_ENUM, ENTITY_STATE_ENUM, ENTITY_TYPE_ENUM, EVENT_ENUM, SCENE_ENUM } from '../../Enum'
 import { PlayerManager } from '../Player/PlayerManager'
 import { WoodenSkeletonManager } from '../WoodenSkeleton/WoodenSkeletonManager'
 import { DoorManager } from '../Door/DoorManager'
@@ -22,13 +22,17 @@ export class BattleManager extends Component {
   level: ILevel
   stage: Node
   smokeLayer: Node
+  private inited: boolean = false
 
   protected onLoad(): void {
+    DataManager.Instance.levelIndex = 1
     EventManager.Instance.on(EVENT_ENUM.NEXT_LEVEL, this.nextLevel, this)
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.checkedArrived, this)
     EventManager.Instance.on(EVENT_ENUM.SHOW_SMOKE, this.generateSmoke, this)
     EventManager.Instance.on(EVENT_ENUM.RECORD_STEP, this.record, this)
     EventManager.Instance.on(EVENT_ENUM.REVOKE_STEP, this.revoke, this)
+    EventManager.Instance.on(EVENT_ENUM.RESTART_LEVEL, this.initLevel, this)
+    EventManager.Instance.on(EVENT_ENUM.QUIT_BATTLE, this.outBattle, this)
   }
 
   protected onDestroy(): void {
@@ -37,6 +41,15 @@ export class BattleManager extends Component {
     EventManager.Instance.off(EVENT_ENUM.SHOW_SMOKE, this.generateSmoke)
     EventManager.Instance.off(EVENT_ENUM.RECORD_STEP, this.record)
     EventManager.Instance.off(EVENT_ENUM.REVOKE_STEP, this.revoke)
+    EventManager.Instance.off(EVENT_ENUM.RESTART_LEVEL, this.initLevel)
+    EventManager.Instance.off(EVENT_ENUM.QUIT_BATTLE, this.outBattle)
+    EventManager.Instance.clear()
+  }
+
+  async outBattle() {
+    // await FaderManager.Instance.fadeIn()
+    this.node.destroy()
+    director.loadScene(SCENE_ENUM.Start)
   }
 
   checkedArrived() {
@@ -53,9 +66,15 @@ export class BattleManager extends Component {
   }
 
   async initLevel() {
+    console.log(DataManager.Instance)
     const level = Levels[`level${DataManager.Instance.levelIndex}`]
     if (level) {
-      await FaderManager.Instance.fadeIn()
+      if (this.inited) {
+        await FaderManager.Instance.fadeIn()
+      } else {
+        await FaderManager.Instance.mask()
+      }
+
       this.clearLevel()
       this.level = level
       DataManager.Instance.mapInfo = this.level.mapInfo
@@ -70,10 +89,12 @@ export class BattleManager extends Component {
         this.generateSmokeLayer(),
         this.generateDoor(),
         this.generateEnemies(),
-        this.generatePlayer(),
       ])
-
+      await this.generatePlayer()
       await FaderManager.Instance.fadeOut()
+      this.inited = true
+    } else {
+      this.outBattle()
     }
   }
 
@@ -143,6 +164,7 @@ export class BattleManager extends Component {
 
   async generateEnemies() {
     const promise = []
+    DataManager.Instance.enemies = []
     for (let index = 0; index < this.level.enemies.length; index++) {
       const enemy = this.level.enemies[index]
       const node = createUINode()
@@ -152,22 +174,8 @@ export class BattleManager extends Component {
       promise.push(manager.init(enemy))
       DataManager.Instance.enemies.push(manager)
     }
+
     await Promise.all(promise)
-  }
-
-  async generateIronEnemies() {
-    const enemy = createUINode()
-    enemy.setParent(this.stage)
-    const ironEnemyManager = enemy.addComponent(IronSkeletonManager)
-    await ironEnemyManager.init({
-      x: 7,
-      y: 3,
-      type: ENTITY_TYPE_ENUM.SKELETON_IRON,
-      direction: DIRECTION_ENUM.TOP,
-      state: ENTITY_STATE_ENUM.IDLE,
-    })
-
-    DataManager.Instance.enemies.push(ironEnemyManager)
   }
 
   clearLevel() {

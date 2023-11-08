@@ -15,7 +15,6 @@ export class WoodenSkeletonManager extends EnemyManager {
     await this.fsm.init()
     super.init(params)
     EventManager.Instance.on(EVENT_ENUM.PLAYER_MOVE_END, this.onAttack, this)
-    this.onChangeDirection(true)
   }
   onDestroy(): void {
     super.onDestroy()

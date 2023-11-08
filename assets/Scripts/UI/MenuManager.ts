@@ -8,4 +8,10 @@ export class MenuManager extends Component {
   hanledUndo() {
     EventManager.Instance.emit(EVENT_ENUM.REVOKE_STEP)
   }
+  hanledRestart() {
+    EventManager.Instance.emit(EVENT_ENUM.RESTART_LEVEL)
+  }
+  hanledOut() {
+    EventManager.Instance.emit(EVENT_ENUM.QUIT_BATTLE)
+  }
 }

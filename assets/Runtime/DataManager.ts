@@ -31,7 +31,7 @@ export class DataManager extends Singleton {
   reset() {
     this.mapRowCount = 0
     this.mapColumnCount = 0
-    this.player?.destroy()
+    // this.player?.destroy()
     this.player = null
     this.enemies = []
     // this.enemies.forEach(el => {

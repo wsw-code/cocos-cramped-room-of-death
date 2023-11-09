@@ -33,15 +33,13 @@ export class PlayerManager extends EnityManager {
     EventManager.Instance.on(EVENT_ENUM.ATTACK_PLAYER, this.onDead, this)
   }
 
-  onDestroy(): void {
+  onDestroy() {
     super.onDestroy()
-    console.log('onDestroy')
     EventManager.Instance.off(EVENT_ENUM.PLAYER_CTRL, this.inputHandle)
     EventManager.Instance.off(EVENT_ENUM.ATTACK_PLAYER, this.onDead)
   }
 
   onAttackShake(shakeType: SHAKE_TYPE_ENUM) {
-    console.log(111)
     EventManager.Instance.emit(EVENT_ENUM.SCREEN_SHAKE, shakeType)
   }
 

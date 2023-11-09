@@ -66,7 +66,6 @@ export class BattleManager extends Component {
   }
 
   async initLevel() {
-    console.log(DataManager.Instance)
     const level = Levels[`level${DataManager.Instance.levelIndex}`]
     if (level) {
       if (this.inited) {
@@ -141,7 +140,7 @@ export class BattleManager extends Component {
 
   async generateSpikes() {
     const promise = []
-    for (let index = 0; index < this.level.bursts.length; index++) {
+    for (let index = 0; index < this.level.spikes.length; index++) {
       const spike = this.level.spikes[index]
       const node = createUINode()
       node.setParent(this.stage)
@@ -179,8 +178,8 @@ export class BattleManager extends Component {
   }
 
   clearLevel() {
+    this.stage.destroyAllChildren()
     DataManager.Instance.reset()
-    this.stage.removeAllChildren()
   }
 
   nextLevel() {

@@ -33,10 +33,6 @@ export class EnemyManager extends EnityManager {
   }
 
   onChangeDirection(isInit: boolean = false) {
-    if (this.type === ENTITY_TYPE_ENUM.SKELETON_WOODEN) {
-      console.log(this.id)
-    }
-
     if (this.state === ENTITY_STATE_ENUM.DEATH || !DataManager.Instance.player) {
       return
     }
